@@ -5,7 +5,6 @@ import axios from "axios";
 function App() {
   const [field, setField] = useState("");
   const [arrayAdvices, setArrayAdvices] = useState([]);
-  //console.log("Field:", field);
 
   useEffect(() => {
     console.log("NEXT EVENT", field);
@@ -20,9 +19,8 @@ function App() {
         );
         if (response.data.slips) {
           const advices = response.data.slips;
-          //console.log("response", advices);
+
           setArrayAdvices(advices);
-          //console.log("response", response);
         } else {
           setArrayAdvices([]);
         }
@@ -50,7 +48,17 @@ function App() {
     "work",
   ];
 
-  //console.log("array advices", arrayAdvices);
+  let output;
+
+  if (field === "") {
+    output = "enter a search term or click a button";
+  } else if (arrayAdvices.length === 0) {
+    output = "no advice found matching this search";
+  } else {
+    output = arrayAdvices.map((advice) => (
+      <li key={advice.id}>{advice.advice}</li>
+    ));
+  }
 
   return (
     <div className="App">
@@ -69,17 +77,9 @@ function App() {
         ))}
       </div>
       <input value={field} onChange={(e) => setField(e.target.value)} />
-      {field && <h3>Here's some solid advice 'bout {field}:</h3>}
+      {field && <h3>Here's some solid advice 'bout :::{field}::::</h3>}
 
-      <ol>
-        {arrayAdvices !== [] ? (
-          arrayAdvices?.map((advice) => (
-            <li key={advice.id}>{advice.advice}</li>
-          ))
-        ) : (
-          <li>Choose a field above to get some wise advice</li>
-        )}
-      </ol>
+      <ol>{output}</ol>
     </div>
   );
 }
