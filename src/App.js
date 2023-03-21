@@ -8,15 +8,19 @@ function App() {
   console.log("Field:", field);
 
   useEffect(() => {
-    const data = async () => {
-      const response = await axios.get(
-        `https://api.adviceslip.com/advice/search/${field}`
-      );
-      const advices = response.data.slips;
-      //console.log("response", advices);
-      setArrayAdvices(advices);
-    };
-    data();
+    try {
+      const data = async () => {
+        const response = await axios.get(
+          `https://api.adviceslip.com/advice/search/${field}`
+        );
+        const advices = response.data.slips;
+        //console.log("response", advices);
+        setArrayAdvices(advices);
+      };
+      data();
+    } catch (e) {
+      console.log(e.message);
+    }
   }, [field]);
 
   const buttons = [
