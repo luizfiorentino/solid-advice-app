@@ -5,22 +5,38 @@ import axios from "axios";
 function App() {
   const [field, setField] = useState("");
   const [arrayAdvices, setArrayAdvices] = useState([]);
-  console.log("Field:", field);
+  //console.log("Field:", field);
 
   useEffect(() => {
-    try {
-      const data = async () => {
+    console.log("NEXT EVENT", field);
+    const controller = new AbortController();
+    console.log("controller,", controller);
+    const data = async () => {
+      try {
         const response = await axios.get(
-          `https://api.adviceslip.com/advice/search/${field}`
+          `https://api.adviceslip.com/advice/search/${field}`,
+          // pass signal to request
+          { signal: controller.signal }
         );
-        const advices = response.data.slips;
-        //console.log("response", advices);
-        setArrayAdvices(advices);
-      };
-      data();
-    } catch (e) {
-      console.log(e.message);
-    }
+        if (response.data.slips) {
+          const advices = response.data.slips;
+          //console.log("response", advices);
+          setArrayAdvices(advices);
+          //console.log("response", response);
+        } else {
+          setArrayAdvices([]);
+        }
+      } catch (e) {
+        console.log(e.message);
+        setArrayAdvices([]);
+      }
+    };
+    data();
+
+    return () => {
+      console.log("CLEANUP OF THE PREVIOUS EFFECT", field);
+      console.log("GETS FIRED BEFORE THE NEXT EVENT");
+    };
   }, [field]);
 
   const buttons = [
@@ -34,7 +50,7 @@ function App() {
     "work",
   ];
 
-  console.log("array advices", arrayAdvices);
+  //console.log("array advices", arrayAdvices);
 
   return (
     <div className="App">
@@ -52,11 +68,14 @@ function App() {
           </button>
         ))}
       </div>
+      <input value={field} onChange={(e) => setField(e.target.value)} />
       {field && <h3>Here's some solid advice 'bout {field}:</h3>}
 
       <ol>
         {arrayAdvices !== [] ? (
-          arrayAdvices.map((advice) => <li key={advice.id}>{advice.advice}</li>)
+          arrayAdvices?.map((advice) => (
+            <li key={advice.id}>{advice.advice}</li>
+          ))
         ) : (
           <li>Choose a field above to get some wise advice</li>
         )}
